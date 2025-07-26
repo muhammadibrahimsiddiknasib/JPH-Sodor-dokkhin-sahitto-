@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>সদর দক্ষিণ সাহিত্য পরিষদ</title>
+
+    <!-- Google Fonts: Tiro Bangla & Hind Siliguri -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&family=Tiro+Bangla:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- jsPDF for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        /* General Styles & Green Theme */
+        :root {
+            --primary-green: #2a9d8f;
+            --secondary-green: #264653;
+            --highlight-color: #e9c46a;
+            --background-color: #f0f4f8;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --font-primary: 'Tiro Bangla', serif;
+            --font-secondary: 'Hind Siliguri', sans-serif;
+            --danger-color: #e76f51;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-secondary);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: auto;
+            padding: 15px;
+        }
+
+        /* Login Screen Styles */
+        #login-container {
+            background-color: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-top: 50px;
+        }
+        #login-container h1 {
+            font-family: var(--font-primary);
+            color: var(--secondary-green);
+            margin-bottom: 25px;
+            font-size: 2.2rem;
+        }
+
+        input[type="email"], input[type="password"], input[type="text"], input[type="tel"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: var(--font-secondary);
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 5px rgba(42, 157, 143, 0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(45deg, var(--primary-green), #2ec4b6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: var(--font-primary);
+            font-size: 18px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.3s;
+            text-transform: uppercase;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(42, 157, 143, 0.4);
+        }
+
+        /* Main App Screen Styles */
+        #app-container {
+            display: none; /* Hidden by default */
+        }
+
+        header {
+            background-color: var(--secondary-green);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        header h1 {
+            font-family: var(--font-primary);
+            font-size: 24px;
+        }
+        .header-buttons button {
+            background-color: var(--highlight-color);
+            color: var(--secondary-green);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: var(--font-secondary);
+            font-weight: 600;
+            width: auto;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+        .header-buttons button:hover {
+            background-color: #f4a261;
+        }
+
+        /* Add Member Form */
+        #add-member-form {
+            background: var(--card-bg);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+         #add-member-form h2 {
+            font-family: var(--font-primary);
+            margin-bottom: 15px;
+            color: var(--secondary-green);
+         }
+
+        /* Members List */
+        #members-list {
+            margin-top: 20px;
+        }
+
+        .member-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: box-shadow 0.3s;
+        }
+        .member-card:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        .member-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .member-header .info {
+            font-family: var(--font-primary);
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--secondary-green);
+        }
+        .member-header .info span {
+            font-family: var(--font-secondary);
+            font-size: 16px;
+            color: #555;
+            display: block;
+            font-weight: normal;
+        }
+        .delete-member-btn {
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .monthly-records {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+        .month {
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            background-color: #fafafa;
+        }
+        .month-name {
+            font-weight: 600;
+            font-family: var(--font-secondary);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .month-inputs {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .month input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-green);
+        }
+        .month input[type="number"] {
+            padding: 6px;
+            font-size: 14px;
+            text-align: center;
+            width: 70px;
+            -moz-appearance: textfield;
+        }
+        .month input[type="number"]::-webkit-outer-spin-button,
+        .month input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        #error-message {
+            color: var(--danger-color);
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        
+        #loader {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: var(--secondary-green);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="login-container">
+            <h1>সদর দক্ষিণ সাহিত্য পরিষদ</h1>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="আপনার ই-মেইল" required>
+                <input type="password" id="login-password" placeholder="আপনার পাসওয়ার্ড" required>
+                <button type="submit">লগইন করুন</button>
+                <p id="error-message"></p>
+            </form>
+        </div>
+
+        <!-- Main App Screen -->
+        <div id="app-container">
+            <header>
+                <h1>সদস্যদের তালিকা</h1>
+                <div class="header-buttons">
+                    <button id="download-pdf-button" title="বার্ষিক রিপোর্ট ডাউনলোড করুন">PDF ডাউনলোড</button>
+                    <button id="logout-button">লগ আউট</button>
+                </div>
+            </header>
+
+            <main>
+                <!-- Form to Add New Member -->
+                <div id="add-member-form">
+                    <h2>নতুন সদস্য যোগ করুন</h2>
+                    <form id="new-member-form">
+                        <input type="text" id="new-member-name" placeholder="সদস্যের নাম" required>
+                        <input type="tel" id="new-member-mobile" placeholder="মোবাইল নম্বর" required>
+                        <button type="submit">সদস্য যোগ করুন</button>
+                    </form>
+                </div>
+
+                <!-- List of Members (Dynamically populated) -->
+                <div id="members-list">
+                    <div id="loader">লোড হচ্ছে...</div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs (using compat libraries for easier syntax) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // STEP 1: আপনার ফায়ারবেস কনফিগারেশন কোডটি এখানে পেস্ট করুন
+        // এই কোডটি Firebase Console থেকে পাবেন
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const membersCollection = db.collection("members");
+
+        // DOM Elements
+        const loginContainer = document.getElementById('login-container');
+        const appContainer = document.getElementById('app-container');
+        const loginForm = document.getElementById('login-form');
+        const logoutButton = document.getElementById('logout-button');
+        const membersList = document.getElementById('members-list');
+        const newMemberForm = document.getElementById('new-member-form');
+        const downloadPdfButton = document.getElementById('download-pdf-button');
+        const errorMessage = document.getElementById('error-message');
+        const loader = document.getElementById('loader');
+
+        const months = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+
+        // --- Authentication Logic ---
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // User is signed in
+                loginContainer.style.display = 'none';
+                appContainer.style.display = 'block';
+                loadMembers();
+            } else {
+                // User is signed out
+                loginContainer.style.display = 'block';
+                appContainer.style.display = 'none';
+            }
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(error => {
+                    console.error("Login Error:", error);
+                    errorMessage.textContent = "আপনার ই-মেইল বা পাসওয়ার্ড সঠিক নয়।";
+                });
+        });
+
+        logoutButton.addEventListener('click', () => {
+            auth.signOut();
+        });
+
+        // --- Firestore Operations ---
+        newMemberForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('new-member-name').value;
+            const mobile = document.getElementById('new-member-mobile').value;
+
+            const initialData = {};
+            months.forEach(month => {
+                initialData[month] = { received: false, amount: 0 };
+            });
+
+            membersCollection.add({
+                name: name,
+                mobile: mobile,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                monthlyData: initialData
+            }).then(() => {
+                newMemberForm.reset();
+            }).catch(error => console.error("Error adding member: ", error));
+        });
+
+        function loadMembers() {
+            membersCollection.orderBy("name").onSnapshot(snapshot => {
+                if (snapshot.empty) {
+                    loader.textContent = 'এখনো কোনো সদস্য যোগ করা হয়নি।';
+                    return;
+                }
+                membersList.innerHTML = ''; // Clear existing list
+                snapshot.forEach(doc => {
+                    const member = doc.data();
+                    const memberId = doc.id;
+                    const card = document.createElement('div');
+                    card.className = 'member-card';
+
+                    let monthlyHTML = '';
+                    months.forEach(month => {
+                        const data = member.monthlyData[month] || { received: false, amount: 0 };
+                        monthlyHTML += `
+                            <div class="month">
+                                <div class="month-name">${month}</div>
+                                <div class="month-inputs">
+                                    <input type="checkbox" title="সাহিত্য পেয়েছে?" ${data.received ? 'checked' : ''} onchange="updateData('${memberId}', '${month}', 'received', this.checked)">
+                                    <input type="number" value="${data.amount}" title="টাকার পরিমাণ" oninput="debounceUpdate('${memberId}', '${month}', 'amount', this.value)" placeholder="টাকা">
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    card.innerHTML = `
+                        <div class="member-header">
+                            <div class="info">
+                                ${member.name}
+                                <span>${member.mobile}</span>
+                            </div>
+                            <button class="delete-member-btn" onclick="deleteMember('${memberId}', '${member.name}')" title="সদস্য মুছে ফেলুন">🗑️</button>
+                        </div>
+                        <div class="monthly-records">
+                            ${monthlyHTML}
+                        </div>
+                    `;
+                    membersList.appendChild(card);
+                });
+            }, error => {
+                console.error("Error loading members:", error);
+                loader.textContent = "সদস্যদের তালিকা লোড করা সম্ভব হয়নি।";
+            });
+        }
+        
+        let debounceTimer;
+        function debounceUpdate(memberId, month, field, value) {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                updateData(memberId, month, field, value);
+            }, 500); // 500ms delay
+        }
+
+        function updateData(memberId, month, field, value) {
+            const updatePath = `monthlyData.${month}.${field}`;
+            
+            if (field === 'amount') {
+                value = Number(value) || 0;
+            }
+
+            membersCollection.doc(memberId).update({
+                [updatePath]: value
+            }).catch(error => console.error("Update Error:", error));
+        }
+
+        function deleteMember(memberId, memberName) {
+            if (confirm(`আপনি কি "${memberName}"-কে তালিকা থেকে মুছে ফেলতে চান?`)) {
+                membersCollection.doc(memberId).delete()
+                    .catch(error => console.error("Error deleting member:", error));
+            }
+        }
+
+        // --- PDF Generation ---
+        downloadPdfButton.addEventListener('click', async () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+            
+            // jsPDF বাংলা ফন্ট সরাসরি সাপোর্ট করে না। তাই হেডার ইংরেজিতে দেওয়া হলো।
+            // বাংলা টেক্সট সঠিকভাবে রেন্ডার করার জন্য ফন্ট এমবেড করতে হয়, যা একটি জটিল প্রক্রিয়া।
+            
+            const tableColumn = ["Name", "Mobile", ...months, "Total (BDT)"];
+            const tableRows = [];
+
+            const querySnapshot = await membersCollection.orderBy("name").get();
+            querySnapshot.forEach(doc => {
+                const member = doc.data();
+                let totalAmount = 0;
+                // Using English name and mobile for PDF to avoid font issues
+                const rowData = [member.name, member.mobile]; 
+                
+                months.forEach(month => {
+                    const monthData = member.monthlyData[month];
+                    const amount = monthData ? monthData.amount : 0;
+                    // Using "Peyeche" for "Received" and "Payni" for "Not Received"
+                    const received = monthData ? (monthData.received ? 'Peyeche' : 'Payni') : 'Payni';
+                    rowData.push(`${received} / ${amount}`);
+                    totalAmount += Number(amount);
+                });
+                
+                rowData.push(totalAmount.toString());
+                tableRows.push(rowData);
+            });
+
+            doc.autoTable({
+                head: [tableColumn],
+                body: tableRows,
+                startY: 20,
+                theme: 'grid',
+                styles: { font: 'helvetica', fontSize: 8 },
+                headStyles: { fillColor: [42, 157, 143] }
+            });
+            doc.text("Sadar Dakshin Sahitya Parishad - Annual Report", 14, 15);
+            doc.save(`annual-report-${new Date().toISOString().slice(0,10)}.pdf`);
+        });
+
+    </script>
+
+</body>
+</html>
